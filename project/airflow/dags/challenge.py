@@ -45,7 +45,7 @@ class DBTTestOperator(BashOperator):
 
 with DAG(
     dag_id=Path(__file__).stem,
-    dag_display_name="DW Flights",
+    dag_display_name="Ancient Challenge",
     start_date=datetime.datetime(2024, 12, 11),
     schedule="0 6 * * *",
     description=__doc__
@@ -112,10 +112,35 @@ with DAG(
             model="challenge.level4_final.user_latest_preferences",
         )
 
-    # Dependencies
+    with TaskGroup(group_id='level5_consumption') as level5_consumption:
+        dbt_run_consumption_report_new_users_last_30days_task = DBTRunOperator(
+            task_id="dbt_run_consumption_report_new_users_last_30days",
+            model="challenge.level5_consumption.report_new_users_last_30days",
+        )
+
+        dbt_run_consumption_report_user_activity_summary_task = DBTRunOperator(
+            task_id="dbt_run_consumption_report_user_activity_summary",
+            model="challenge.level5_consumption.report_user_activity_summary",
+        )
+
+        dbt_run_consumption_report_user_daily_transactions_task = DBTRunOperator(
+            task_id="dbt_run_consumption_report_user_daily_transactions",
+            model="challenge.level5_consumption.report_user_daily_transactions",
+        )
+
+        dbt_run_consumption_report_user_latest_preferences_task = DBTRunOperator(
+            task_id="dbt_run_consumption_report_user_latest_preferences",
+            model="challenge.level5_consumption.report_user_latest_preferences",
+        )
+
+    ## Dependencies
     start_task >> level1_landing >> level2_source
+
+    # Level 2 to Level 3
     dbt_run_source_transactions_task >> dbt_run_intermediate_helper_user_daily_transactions_task
     dbt_run_source_user_preferences_task >> dbt_run_intermediate_user_preferences_extra_info_task
+
+    # Levels 2 and 3 to Level 4
     [
         dbt_run_source_transactions_task,
         dbt_run_source_users_task
@@ -130,4 +155,8 @@ with DAG(
         dbt_run_intermediate_user_preferences_extra_info_task
     ] >> dbt_run_final_user_latest_preferences_task
 
-    start_task >> test_dbt_operator >> end_task
+    # Level 4 to Level 5
+    dbt_run_final_new_users_last_30days_task >> dbt_run_consumption_report_new_users_last_30days_task >> end_task
+    dbt_run_final_user_activity_summary_task >> dbt_run_consumption_report_user_activity_summary_task >> end_task
+    dbt_run_final_user_daily_transactions_task >> dbt_run_consumption_report_user_daily_transactions_task >> end_task
+    dbt_run_final_user_latest_preferences_task >> dbt_run_consumption_report_user_latest_preferences_task >> end_task
