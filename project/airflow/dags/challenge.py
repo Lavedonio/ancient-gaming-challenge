@@ -21,7 +21,7 @@ class DBTRunOperator(BashOperator):
 
     def __init__(self, model: str, **kwargs) -> None:
         self.model = model
-        kwargs['bash_command'] = f"dbt run --project-dir /opt/airflow/dbt/nyxa --profiles-dir /opt/airflow/dbt --select {self.model}"
+        kwargs['bash_command'] = f"dbt run --project-dir /opt/airflow/dbt/ancient --profiles-dir /opt/airflow/dbt --select {self.model}"
         super().__init__(**kwargs)
 
     def execute(self, context):
@@ -36,7 +36,7 @@ class DBTTestOperator(BashOperator):
 
     def __init__(self, model: str, **kwargs) -> None:
         self.model = model
-        kwargs['bash_command'] = f"dbt test --project-dir /opt/airflow/dbt/nyxa --profiles-dir /opt/airflow/dbt --select {self.model}"
+        kwargs['bash_command'] = f"dbt test --project-dir /opt/airflow/dbt/ancient --profiles-dir /opt/airflow/dbt --select {self.model}"
         super().__init__(**kwargs)
 
     def execute(self, context):
@@ -52,12 +52,6 @@ with DAG(
 ):
     start_task = EmptyOperator(task_id="start")
     end_task = EmptyOperator(task_id="end")
-
-    with TaskGroup(group_id='test_task_group') as test_task_group:
-        test_dbt_operator = DBTRunOperator(
-            task_id="test_dbt",
-            model="custom_dbt_model",
-        )
 
     with TaskGroup(group_id='level1_landing') as level1_landing:
         landing_users = EmptyOperator(task_id="landing_users")
