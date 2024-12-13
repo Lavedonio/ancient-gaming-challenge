@@ -1,0 +1,14 @@
+ancient:
+  outputs:
+    dev:
+      dataset: ancient_challenge
+      job_execution_timeout_seconds: 300
+      job_retries: 1
+      keyfile: dbt_local_gcp_key.json
+      location: US
+      method: service-account
+      priority: interactive
+      project: stoked-courier-444606-c2
+      threads: 4
+      type: bigquery
+  target: dev

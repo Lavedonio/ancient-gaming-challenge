@@ -1,0 +1,58 @@
+
+version: 2
+
+models:
+  - name: user_preferences_extra_info
+    description: "This table contain the user's preferences with extra logic added"
+    columns:
+      - name: id
+        description: "The primary key for the user_preferences table"
+        data_type: INT64
+        data_tests:
+          - unique
+          - not_null
+      - name: user_id
+        description: "The primary key for the users table"
+        data_type: INT64
+        data_tests:
+          - not_null
+      - name: preference_version
+        description: "The version of the preference"
+        data_type: INT64
+      - name: is_latest_preference
+        description: "Shows if that's the latest preference version"
+        data_type: BOOL
+      - name: preferred_language
+        description: "The user's prefered language"
+        data_type: STRING
+      - name: notifications_enabled
+        description: "Shows if the user has enabled notifications"
+        data_type: BOOL
+      - name: marketing_opt_in
+        description: "Shows if the user has opted in on marketing communication"
+        data_type: BOOL
+      - name: created_at
+        description: "The timestamp when the user preference was created"
+        data_type: TIMESTAMP
+      - name: updated_at
+        description: "The timestamp when the user preference was last updated"
+        data_type: TIMESTAMP
+
+  - name: helper_user_daily_transactions
+    description: "A report that shows user's daily transactions aggregated by day"
+    columns:
+      - name: user_id
+        description: "The primary key for the users table"
+        data_type: INT64
+      - name: transaction_date
+        description: "The date the transaction"
+        data_type: DATE
+      - name: type
+        description: "The transaction type"
+        data_type: STRING
+        data_tests:
+          - accepted_values:
+              values: ['deposit', 'withdrawal']
+      - name: total_daily_amount
+        description: "The total deposit transaction amount"
+        data_type: NUMERIC

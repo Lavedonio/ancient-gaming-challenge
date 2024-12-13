@@ -1,0 +1,5 @@
+dbt>=1.0
+dbt-core==1.9.0
+dbt-postgres==1.9.0
+dbt-bigquery==1.9.0
+pandas==2.2.3
