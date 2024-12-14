@@ -5,8 +5,8 @@ sources:
   - name: l1_landing
     database: stoked-courier-444606-c2
     tables:
-      - name: users
-        description: "This table contain the user's information"
+      - name: raw_users
+        description: "This table contains the raw data of the user's information"
         columns:
           - name: id
             description: "The primary key for the users table"
@@ -23,11 +23,12 @@ sources:
           - name: email
             description: "The email of the user"
             data_type: STRING
-          - name: users
-            identifier: users
+          - name: ds
+            description: "The execution date for this row, which is used to partition the table"
+            data_type: DATE
 
-      - name: user_preferences
-        description: "This table contain the user's preferences"
+      - name: raw_user_preferences
+        description: "This table contains the raw data of the user's preferences"
         columns:
           - name: id
             description: "The primary key for the user_preferences table"
@@ -36,7 +37,7 @@ sources:
               - unique
               - not_null
           - name: user_id
-            description: "The primary key for the users table"
+            description: "The user ID that has these preferences"
             data_type: INT64
             data_tests:
               - not_null
@@ -49,29 +50,29 @@ sources:
           - name: marketing_opt_in
             description: "Shows if the user has opted in on marketing communication"
             data_type: BOOL
-          - name: created_at
-            description: "The timestamp when the user preference was created"
+          - name: event_timestamp
+            description: "The timestamp when the event happened"
             data_type: TIMESTAMP
-          - name: updated_at
-            description: "The timestamp when the user preference was last updated"
-            data_type: TIMESTAMP
+          - name: ds
+            description: "The execution date for this row, which is used to partition the table"
+            data_type: DATE
 
-      - name: transactions
-        description: "This table contain the user's preferences"
+      - name: raw_transactions
+        description: "This table contains the raw data of the transactions"
         columns:
           - name: id
-            description: "The primary key for the user_preferences table"
+            description: "The primary key for the transactions table"
             data_type: INT64
             data_tests:
               - unique
               - not_null
           - name: user_id
-            description: "The primary key for the users table"
+            description: "The user ID that was part of the transaction"
             data_type: INT64
             data_tests:
               - not_null
           - name: transaction_date
-            description: "The date the transaction"
+            description: "The date of the transaction"
             data_type: DATE
           - name: amount
             description: "The transaction amount"
@@ -82,4 +83,6 @@ sources:
             data_tests:
               - accepted_values:
                   values: ['deposit', 'withdrawal']
-
+          - name: ds
+            description: "The execution date for this row, which is used to partition the table"
+            data_type: DATE

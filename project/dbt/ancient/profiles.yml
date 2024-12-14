@@ -4,7 +4,8 @@ ancient:
       dataset: ancient_challenge
       job_execution_timeout_seconds: 300
       job_retries: 1
-      keyfile: dbt_local_gcp_key.json
+      # keyfile: dbt_local_gcp_key.json
+      keyfile: /home/airflow/gcs/dags/dbt/ancient/dbt_composer_gcp_key.json
       location: US
       method: service-account
       priority: interactive

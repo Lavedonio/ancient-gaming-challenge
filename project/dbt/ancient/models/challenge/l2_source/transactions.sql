@@ -1,5 +1,5 @@
 /*
-The user's table
+The transactions's table
 */
 
-SELECT * FROM {{ source('l1_landing', 'transactions') }}
+SELECT * FROM {{ source('l1_landing', 'raw_transactions') }}

@@ -62,7 +62,7 @@ models:
         description: "The primary key for the users table"
         data_type: INT64
       - name: transaction_date
-        description: "The date the transaction"
+        description: "The date of the transaction"
         data_type: DATE
       - name: total_deposit
         description: "The total deposit transaction amount"

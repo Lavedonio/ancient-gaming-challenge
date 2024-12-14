@@ -31,7 +31,7 @@ models:
           - unique
           - not_null
       - name: user_id
-        description: "The primary key for the users table"
+        description: "The user ID that has these preferences"
         data_type: INT64
         data_tests:
           - not_null
@@ -55,18 +55,18 @@ models:
     description: "This table contain the user's preferences"
     columns:
       - name: id
-        description: "The primary key for the user_preferences table"
+        description: "The primary key for the transactions table"
         data_type: INT64
         data_tests:
           - unique
           - not_null
       - name: user_id
-        description: "The primary key for the users table"
+        description: "The user ID that was part of the transaction"
         data_type: INT64
         data_tests:
           - not_null
       - name: transaction_date
-        description: "The date the transaction"
+        description: "The date of the transaction"
         data_type: DATE
       - name: amount
         description: "The transaction amount"
