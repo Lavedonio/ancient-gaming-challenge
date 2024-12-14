@@ -114,7 +114,7 @@ with DAG(
                 src=f'raw_{table.name}.csv',
                 dst="".join([
                     'challenge_data/',
-                    f'{table.name}/',
+                    f'raw_{table.name}/',
                     'ds={{ ds }}/',
                     'file.csv'
                 ]),
