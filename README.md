@@ -37,7 +37,7 @@ This part takes care of creating the data in the raw files and uploading them to
 
 This is the part that would be the most diferent in a real production environment. In that case, the files wouldn't be generated on the spot, but rather be added through a different service, or even added to BigQuery directly via Fivetran or Stitch, for instance, skipping this process altogether.
 
-#### Level 1 = landing
+#### Level 1 - landing
 This is the first stage of the data in BigQuery. Here, the raw data is loaded as is and partitioned by the execution date that comes from Airflow. This part is crucial to make sure that the pipeline is idempotent and can be backfilled in the future if needed.
 
 #### Level 2 - source
