@@ -59,19 +59,34 @@ class DataCreation:
         self.transactions = []
 
     def __generate_base_global_id(self, base_id: int):
+        """
+        Generates a global unique id for the current execution date.
+        In the current implementation, it's limited to 100 IDs per day
+        """
+        assert base_id < 100, "Exceeded daily ID limit"
         return int(self.execution_date.strftime('%Y%m%d')) * 100 + base_id
 
     def __generate_previous_base_global_id(self, base_id: int, days_ago: int = 0):
+        """
+        Generates a global unique id for the previous execution dates.
+        In the current implementation, it's limited to 100 IDs per day
+        """
+        assert base_id < 100, "Exceeded daily ID limit"
         return int((self.execution_date - timedelta(days=days_ago)).strftime('%Y%m%d')) * 100 + base_id
 
     @staticmethod
     def __generate_random_datetime(min_date: datetime, max_date: datetime):
+        """Generates a random datetime given the min and max values"""
         delta = max_date - min_date
         int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
         random_second = randrange(int_delta)
         return min_date + timedelta(seconds=random_second)
 
     def generate_user_datapoints(self):
+        """
+        Generates both RawUser and RawUserPreference data points based only on the name, languages and execution date.
+        Also generates the number of transactions for the given user.
+        """
         self.user_email = self.user_name.lower().replace(' ', '.') + "@example.com"
         signup_datetime = self.__generate_random_datetime(datetime(2024, 1, 1), self.execution_datetime)
         self.user_registration_date = signup_datetime.date()
@@ -94,6 +109,9 @@ class DataCreation:
         self.number_of_transactions = randrange(0, 4)
     
     def __transaction_logic(self, daily_transaction_counter: int, number_of_transactions: int, days_ago: int = 0) -> int:
+        """
+        Handles both the logic for current user transactions as well as past user transactions.
+        """
         for transaction_number in range(1, number_of_transactions + 1):
 
             # Transaction Amount
@@ -125,6 +143,10 @@ class DataCreation:
         return daily_transaction_counter
 
     def generate_transactions(self, daily_transaction_counter: int) -> int:
+        """
+        Generates transactions for accounts created today (number of transactions defined at random previously),
+        and also for accounts created in the past 2 days, to add more complexity to the data.
+        """
         # Transactions for accounts created today
         daily_transaction_counter = self.__transaction_logic(daily_transaction_counter, self.number_of_transactions, 0)
 
@@ -145,6 +167,14 @@ class DataCreation:
 
 
 def generate_raw_data(save_locally: bool = False, **kwargs):
+    """
+    Run the main logic for data creation on the 3 pre-determined tables for this challenge:
+    - User
+    - User Preference
+    - Transaction
+    """
+    # If it's run by Airflow, the ds and ts values will be populated and used.
+    # Otherwise, uses the default values instead.
     try:
         ds: str = kwargs['ds']
         ts: str = kwargs['ts']
@@ -155,26 +185,32 @@ def generate_raw_data(save_locally: bool = False, **kwargs):
         execution_date = datetime.strptime(ds, '%Y-%m-%d').date()
         execution_datetime = datetime.strptime(ts, '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None)
 
+    # Counter that keeps increasing in order to keep the transaction ID unique
     daily_transaction_counter = 1
 
+    # Getting predetermined values for creating names and selecting languages.
     with open(DATA_LOCATION / 'random_names.txt') as names_file:
         names = [x.replace('\n', '') for x in names_file.readlines()]
 
     with open(DATA_LOCATION / 'languages.txt') as lang_file:
         available_languages = [x.replace('\n', '') for x in lang_file.readlines()]
 
+    # Defines the number of new users and which names will be picked today
     number_of_new_users = randrange(5, 50)
     sampled_names = sample(names, number_of_new_users)
 
+    # Main loop for the data creation
     datapoints: list[DataCreation] = []
     for index, name in enumerate(sampled_names, start=1):
         user_data = DataCreation(execution_date, execution_datetime, index, name, available_languages)
         user_data.generate_user_datapoints()
         daily_transaction_counter = user_data.generate_transactions(daily_transaction_counter)
+        datapoints.append(user_data)
+        # Debug
         # print(user_data)
         # print()
-        datapoints.append(user_data)
 
+    # Creating the DataFrames based on the datapoints created previously
     users_df = pd.DataFrame([asdict(x.user) for x in datapoints])
     users_df.set_index('id', inplace=True)
     print("Users Dataframe:")
